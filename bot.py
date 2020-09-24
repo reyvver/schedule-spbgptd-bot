@@ -1,94 +1,86 @@
 import telebot
-from telebot import types
 import config
 import schedule_manager
+from telebot import types
 
 bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 timetable = schedule_manager
+buttons_text = ['📌 Сегодня', '📋 Завтра', '📍 Эта неделя', '📅 Следующая']
 
 
 ############################################
 
 
-# handler for command /start
+# Handler for command /start
 @bot.message_handler(commands=['start'])
 def on_start(message):
     get_data()
     bot.send_message(
         message.chat.id,
-        "Начнем работу, оки?",
+        "setting...up...Done!",
         reply_markup=main_keyboard()
     )
 
 
-# Show keyboard
+# Getting started with sheet's data
+def get_data():
+    timetable.refresh_data()
+
+
+# Returns keyboard with menu buttons
 def main_keyboard():
     keyboard = types.ReplyKeyboardMarkup(row_width=2)
 
-    button_1 = types.KeyboardButton('Сегодня')
-    button_2 = types.KeyboardButton('Завтра')
-    button_3 = types.KeyboardButton('Эта неделя')
-    button_4 = types.KeyboardButton('Следующая')
+    button_1 = types.KeyboardButton(buttons_text[0])
+    button_2 = types.KeyboardButton(buttons_text[1])
+    button_3 = types.KeyboardButton(buttons_text[2])
+    button_4 = types.KeyboardButton(buttons_text[3])
 
     keyboard.add(button_1, button_2, button_3, button_4)
+    keyboard.resize_keyboard = True
     return keyboard
 
 
 # Handler for keyboard buttons
 @bot.message_handler(content_types=['text'])
-def on_text(message):
-    if message.text.lower() == "сегодня":
-        on_today(message)
-    if message.text.lower() == "завтра":
-        on_tomorrow(message)
-    if message.text.lower() == "эта неделя":
-        on_current(message)
-    if message.text.lower() == "следующая":
-        on_next(message)
+def keyboard_handlers(message):
+    if message.text == buttons_text[0]:
+        today_handler(message)
+    if message.text == buttons_text[1]:
+        tomorrow_handler(message)
+    if message.text == buttons_text[2]:
+        current_week_handler(message)
+    if message.text == buttons_text[3]:
+        next_week_handler(message)
 
 
-# Getting started with sheet's data
-def get_data():
-    timetable.on_start_schedule()
+# Handler for keyboard button 'today'
+def today_handler(message):
+    bot.reply_to(message, timetable.get_day_schedule("Сегодня"), parse_mode="Markdown")
 
 
-def on_today(message):
-    bot.reply_to(message, timetable.print_day_schedule("сегодня"), parse_mode="Markdown")
+# Handler for keyboard button 'tomorrow'
+def tomorrow_handler(message):
+    bot.reply_to(message, timetable.get_day_schedule("Завтра"), parse_mode="Markdown")
 
 
-# Handler for button 'current week'
-def on_current(message):
-    bot.send_message(message.chat.id, timetable.print_week_schedule("текущая"), parse_mode="Markdown")
+# Handler for keyboard button 'current week'
+def current_week_handler(message):
+    bot.reply_to(message, timetable.set_week_schedule("Текущая"), parse_mode="Markdown")
+    # current_type = timetable.set_week_schedule("Текущая")
+    # print_week_schedule(message, current_type)
 
 
-# Handler for button 'today'
-def on_next(message):
-    bot.send_message(message.chat.id, timetable.print_week_schedule("следующая"), parse_mode="Markdown")
+# Handler for keyboard button 'next week'
+def next_week_handler(message):
+    bot.reply_to(message, timetable.set_week_schedule("Следующая"), parse_mode="Markdown")
+    # current_type = timetable.set_week_schedule("Следующая")
+    # print_week_schedule(message, current_type)
 
 
-# Handler for button 'tomorrow'
-def on_tomorrow(message):
-    bot.reply_to(message, timetable.print_day_schedule("завтра"), parse_mode="Markdown")
-
-
-# # Handler for button 'today'
-# def on_today():
-#     timetable.print_day_schedule("сегодня")
-#
-#
-# # Handler for button 'tomorrow'
-# def on_tomorrow():
-#     timetable.print_day_schedule("завтра")
-#
-#
-# # Handler for button 'current week'
-# def on_current():
-#     timetable.load_data_from_sheet()
-#
-#
-# # Handler for button 'today'
-# def on_next():
-#     timetable.load_data_from_sheet()
+def print_week_schedule(message, type_of_week: bool):
+    for i in range(6):
+        bot.send_message(message.chat.id, timetable.send_week_day(i, type_of_week), parse_mode="Markdown")
 
 
 bot.polling(none_stop=True)
