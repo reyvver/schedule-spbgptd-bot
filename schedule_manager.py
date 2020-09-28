@@ -116,11 +116,16 @@ def get_item(item: ClassItem):
     result: str = ""
     if item.class_name != "":  # Проверка есть ли в этот день какая-нибудь пара - у нее всегда есть название в таблице
         if item.group_index == "":
-            result = "*• " + item.time_range + "* " + item.class_name + " (" + item.class_type + ") \n" + item.location + \
-                      "\n*Общая*" + " \n\n"
+            result = "\n      ⏰ _" + item.time_range + "_ \n" \
+                     "      🖍 " + item.class_name + " \n" \
+                     "      🏫 " + item.location + " \n" \
+                     "      `Общая`" + " \n\n"
         else:
-            result = "*• " + item.time_range + "* " + item.class_name + " (" + item.class_type + ") \n" + item.location + \
-                     "\n*" + item.group_index + " подгруппа * " + " \n\n"
+            result = "\n      ⏰ _" + item.time_range + "_ \n" \
+                     "     🖍 " + item.class_name + " \n" \
+                     "     🏫 " + item.location + " \n" \
+                     "     `" + item.group_index + " подгруппа` \n\n"
+
     return result
 
 
@@ -143,7 +148,6 @@ def get_selected_day_schedule(number: int, type_of_week: bool):
 def get_day_schedule(type_of_day: str):
     selected_day = datetime.datetime.today()  # Выбарнный день: сегодня или завтра
     current_type = define_type_of_current_week(selected_day)  # Тип недели относительно сегодня
-    current_day_of_week = selected_day.weekday()  # Номер выбранного дня в неделе
     current_week_number = selected_day.isocalendar()[1]  # Номер текущей недели в календаре
 
     if type_of_day == "Завтра":
@@ -152,8 +156,11 @@ def get_day_schedule(type_of_day: str):
                 current_week_number:  # Если сегодня воскресенье - то след день другая неделя по четности
             current_type = not current_type
 
+    current_day_of_week = selected_day.weekday()  # Номер выбранного дня в неделе
+
     if current_day_of_week != 6:  # Если не воскресенье то
-        result = get_selected_day_schedule(current_day_of_week, current_type)
+        result = "Расписание на " + type_of_day.lower() + ":\n" + get_selected_day_schedule(current_day_of_week,
+                                                                                             current_type)
         return result
     else:
         return "уихадноу"
@@ -183,5 +190,4 @@ def set_week_schedule(type_of_week: str):
 
 def send_week_day(number: int, type_of_week):
     return emoji[number] + " *" + days_of_week[number] + "* \n" + \
-                 get_selected_day_schedule(number, type_of_week) + "\n\n"
-
+           get_selected_day_schedule(number, type_of_week) + "\n\n"
