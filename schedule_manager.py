@@ -29,9 +29,9 @@ def load_data_from_sheet():
 def define_type_of_current_week(day: datetime):
     number = day.isocalendar()[1]
     if number % 2 == 0:
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 # Создание единичной записи
@@ -112,40 +112,45 @@ def refresh_data():
 ######################################################
 
 # Возвращает строку со полями занятия: время занятия, название, аудитория и тд
-def get_item(item: ClassItem):
+def get_item(item: ClassItem, view_type):
     result: str = ""
     if item.class_name != "":  # Проверка есть ли в этот день какая-нибудь пара - у нее всегда есть название в таблице
         if item.group_index == "":
-            result = "\n      ⏰ _" + item.time_range + "_ \n" \
-                     "      🖍 " + item.class_name + " \n" \
-                     "      🏫 " + item.location + " \n" \
-                     "      `Общая`" + " \n\n"
+            group = "`Общая`"
         else:
+            group = "`" + item.group_index + " подгруппа`"
+
+        if view_type == "full":
             result = "\n      ⏰ _" + item.time_range + "_ \n" \
-                     "     🖍 " + item.class_name + " \n" \
-                     "     🏫 " + item.location + " \n" \
-                     "     `" + item.group_index + " подгруппа` \n\n"
+                      "      🖍 " + item.class_name + " \n" \
+                      "      🏫 " + item.location + " \n"
+
+            result = result + "     " + group + "\n\n"
+        else:
+            result = "\n⏰ " + item.time_range + "  -  " + item.class_name + "\n" \
+                     "🏫 " + item.location + " (" + group + ")" + "\n"
 
     return result
 
 
 # Возвращает расписание на выбранный день (включает проверку на четность / нечетность)
-def get_selected_day_schedule(number: int, type_of_week: bool):
+def get_selected_day_schedule(number: int, type_of_week: bool, view_type):
     current_schedule: DaySchedule = schedule.days_schedule[number]
     result: str = ""
 
     for couple in current_schedule.class_couples:
         if type_of_week:
-            day = get_item(couple.denominator)  # Если четная - то знаменатель
+            day = get_item(couple.denominator, view_type)  # Если четная - то знаменатель
         else:
-            day = get_item(couple.numerator)  # Если нечетная - то числитель
+            day = get_item(couple.numerator, view_type)  # Если нечетная - то числитель
+
         result = result + day
 
     return result
 
 
 # Возвращает расписание на сегодня / завтра
-def get_day_schedule(type_of_day: str):
+def get_day_schedule(type_of_day: str, view_type):
     selected_day = datetime.datetime.today()  # Выбарнный день: сегодня или завтра
     current_type = define_type_of_current_week(selected_day)  # Тип недели относительно сегодня
     current_week_number = selected_day.isocalendar()[1]  # Номер текущей недели в календаре
@@ -160,21 +165,14 @@ def get_day_schedule(type_of_day: str):
 
     if current_day_of_week != 6:  # Если не воскресенье то
         result = "Расписание на " + type_of_day.lower() + ":\n" + get_selected_day_schedule(current_day_of_week,
-                                                                                             current_type)
+                                                                                            current_type, view_type)
         return result
     else:
         return "уихадноу"
 
 
 # Возвращает расписание на неделю
-def set_week_schedule(type_of_week: str):
-    current_type = define_type_of_current_week(datetime.datetime.today())
-
-    # if type_of_week == "Следующая":
-    #     current_type = not current_type
-    #
-    # return current_type
-
+def get_week_schedule(type_of_week: str, view_type):
     current_type = define_type_of_current_week(datetime.datetime.today())
     result: str = ""
 
@@ -182,12 +180,23 @@ def set_week_schedule(type_of_week: str):
         current_type = not current_type
 
     for i in range(6):
-        result = result + emoji[i] + " *" + days_of_week[i] + "* \n" + \
-                 get_selected_day_schedule(i, current_type) + "\n\n"
+        timetable = get_selected_day_schedule(i, current_type, view_type)
+        if timetable != "":
+            result = result + emoji[i] + " *" + days_of_week[i] + "* \n" + timetable + "\n\n"
 
     return result
 
 
-def send_week_day(number: int, type_of_week):
-    return emoji[number] + " *" + days_of_week[number] + "* \n" + \
-           get_selected_day_schedule(number, type_of_week) + "\n\n"
+# def send_week_day(number: int, type_of_week, view_type: bool):
+#     return emoji[number] + " *" + days_of_week[number] + "* \n" + \
+#            get_selected_day_schedule(number, type_of_week, view_type) + "\n\n"
+
+
+def type_of_week():
+    today = datetime.datetime.today()
+    result = define_type_of_current_week(today)
+
+    if result:
+        return "Текущая - четная неделя"
+    else:
+        return "Текущая - нечетная неделя"
