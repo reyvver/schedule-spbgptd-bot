@@ -19,7 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1b92f9e1-be79-47d0-93a7-665fd3f41e5d" name="Default Changelist" comment="" />
+    <list default="true" id="1b92f9e1-be79-47d0-93a7-665fd3f41e5d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schedule_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/schedule_manager.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,6 +48,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../experiments/schedule_manager.py" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Python.bot">
@@ -117,43 +123,5 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state width="1453" height="229" key="GridCell.Tab.0.bottom" timestamp="1601061718927">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="229" key="GridCell.Tab.0.bottom/62.0.1474.864@62.0.1474.864" timestamp="1601061718927" />
-    <state width="1453" height="229" key="GridCell.Tab.0.center" timestamp="1601061718927">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="229" key="GridCell.Tab.0.center/62.0.1474.864@62.0.1474.864" timestamp="1601061718927" />
-    <state width="1453" height="229" key="GridCell.Tab.0.left" timestamp="1601061718927">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="229" key="GridCell.Tab.0.left/62.0.1474.864@62.0.1474.864" timestamp="1601061718927" />
-    <state width="1453" height="229" key="GridCell.Tab.0.right" timestamp="1601061718927">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="229" key="GridCell.Tab.0.right/62.0.1474.864@62.0.1474.864" timestamp="1601061718927" />
-    <state width="1453" height="269" key="GridCell.Tab.1.bottom" timestamp="1600205877223">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="269" key="GridCell.Tab.1.bottom/62.0.1474.864@62.0.1474.864" timestamp="1600205877223" />
-    <state width="1453" height="269" key="GridCell.Tab.1.center" timestamp="1600205877222">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="269" key="GridCell.Tab.1.center/62.0.1474.864@62.0.1474.864" timestamp="1600205877222" />
-    <state width="1453" height="269" key="GridCell.Tab.1.left" timestamp="1600205877222">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="269" key="GridCell.Tab.1.left/62.0.1474.864@62.0.1474.864" timestamp="1600205877222" />
-    <state width="1453" height="269" key="GridCell.Tab.1.right" timestamp="1600205877223">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state width="1453" height="269" key="GridCell.Tab.1.right/62.0.1474.864@62.0.1474.864" timestamp="1600205877223" />
-    <state x="462" y="181" width="672" height="678" key="search.everywhere.popup" timestamp="1600975809455">
-      <screen x="62" y="0" width="1474" height="864" />
-    </state>
-    <state x="462" y="181" width="672" height="678" key="search.everywhere.popup/62.0.1474.864@62.0.1474.864" timestamp="1600975809455" />
   </component>
 </project>
