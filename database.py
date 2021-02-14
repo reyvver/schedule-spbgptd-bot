@@ -10,13 +10,13 @@ dbm_connection = sqlite3.connect(db_memory, check_same_thread=False)
 def create_table(table_name: str, columns: str, database: str):
     sql_query = '''CREATE TABLE IF NOT EXISTS %s (%s);''' % (table_name, columns)
     post_sql_query(sql_query, database)
-    print("table '" + table_name + "' is created")
+    # print("table '" + table_name + "' is created")
 
 
 def delete_table(table_name: str, database: str):
     sql_query = ('''DROP TABLE %s''' % table_name)
     post_sql_query(sql_query, database)
-    print("table '" + table_name + "' is deleted")
+    # print("table '" + table_name + "' is deleted")
 
 
 def insert_data(table_name: str, values: [], database: str):
@@ -99,6 +99,8 @@ def register_user(chat_id, user_name, first_name, group_name):
         if len(result) == 0:
             values = [chat_id, user_name, first_name, group_name, "full"]
             insert_data("users", values, db_file)
+            if user_name is None:
+                user_name = "Безымянный"
             print("пользователь " + user_name + " (" + str(chat_id) + ") добавлен")
         else:
             print("пользователь " + user_name + " сделал рестарт")
@@ -138,10 +140,8 @@ def start_db():
 
 
 def reset_commands_count():
-    print(select_all_users())
     values = {'commands_count': 0}
     update_data("users", values, db_memory)
-    print(select_all_users())
 
 
 def get_user_data(chat_id: int, item: str, database: str):
@@ -150,6 +150,15 @@ def get_user_data(chat_id: int, item: str, database: str):
 
 
 start_db()
+
+
+# def change_command_count(command_name):
+#     sql_query = '''SELECT count FROM commands WHERE command = "%s"''' % command_name
+#     number: int = post_sql_query(sql_query, db_file)[0][0] + 1
+#     values = {"count": number}
+#     update_data("commands", values, db_file, 'command="' + command_name + '"')
+
+
 # create_table("users", "chat_id INTEGER PRIMARY KEY NOT NULL, user_name TEXT, first_name TEXT", db_file)
 
 # my_dict = {'a': 1, 'b': 2, 'c': 3}

@@ -5,7 +5,6 @@ from schedule_models import *
 
 gc = gspread.service_account()
 table = gc.open_by_key(config.SHEET_KEY)
-current_worksheet = table.sheet1
 
 values: List[List] = []  # Все значения, полученные из таблицы Excel
 days_of_week = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]
@@ -14,12 +13,15 @@ emoji = ["\U0001F4D5", "\U0001F4D7", "\U0001F4D8", "\U0001F4D9", "\U0001F4D2", "
 current_time: str = ""
 schedule: WeekSchedule
 
+group_list = ["1-ТИД-3", "1-ГДА-10"]
+
 
 ######################################################
 
 # Загрузить все строчки из листа
-def load_data_from_sheet():
+def load_data_from_sheet(group_name: str):
     global values
+    current_worksheet = table.worksheet(group_name)
     values = current_worksheet.get_all_values()
 
 
@@ -65,7 +67,6 @@ def get_items_couple(numerator_row: List, denominator_row: List):
 
 # Создание расписания на день. У каждого дня 12 строчек
 def initialize_day_schedule(first_row_of_day: int):
-    # global current_time
 
     day_couples: List[ClassItemCouple] = []
 
@@ -104,8 +105,8 @@ def initialize_schedule():
 
 
 # Считываем данные из таблицы Excel и присваиваем переменным значения
-def refresh_data():
-    load_data_from_sheet()
+def refresh_data(group_name: str):
+    load_data_from_sheet(group_name)
     initialize_schedule()
 
 
@@ -122,24 +123,24 @@ def get_item(item: ClassItem, view_type):
 
         if view_type == "full":
             result = "\n      ⏰ _" + item.time_range + "_ \n" \
-                      "      🖍 " + item.class_name + " \n" \
-                      "      🏫 " + item.location + " \n"
+                                                       "      🖍 " + item.class_name + " \n" \
+                                                                                       "      🏫 " + item.location + " \n"
 
             result = result + "     " + group + "\n\n"
         else:
             result = "\n⏰ " + item.time_range + "  -  " + item.class_name + "\n" \
-                     "🏫 " + item.location + " (" + group + ")" + "\n"
+                                                                            "🏫 " + item.location + " (" + group + ")" + "\n"
 
     return result
 
 
 # Возвращает расписание на выбранный день (включает проверку на четность / нечетность)
-def get_selected_day_schedule(number: int, type_of_week: bool, view_type):
+def get_selected_day_schedule(number: int, type_week: bool, view_type):
     current_schedule: DaySchedule = schedule.days_schedule[number]
     result: str = ""
 
     for couple in current_schedule.class_couples:
-        if type_of_week:
+        if type_week:
             day = get_item(couple.denominator, view_type)  # Если четная - то знаменатель
         else:
             day = get_item(couple.numerator, view_type)  # Если нечетная - то числитель
@@ -172,11 +173,11 @@ def get_day_schedule(type_of_day: str, view_type):
 
 
 # Возвращает расписание на неделю
-def get_week_schedule(type_of_week: str, view_type):
+def get_week_schedule(type_week: str, view_type):
     current_type = define_type_of_current_week(datetime.datetime.today())
     result: str = ""
 
-    if type_of_week == "Следующая":
+    if type_week == "Следующая":
         current_type = not current_type
 
     for i in range(6):
@@ -185,11 +186,6 @@ def get_week_schedule(type_of_week: str, view_type):
             result = result + emoji[i] + " *" + days_of_week[i] + "* \n" + timetable + "\n\n"
 
     return result
-
-
-# def send_week_day(number: int, type_of_week, view_type: bool):
-#     return emoji[number] + " *" + days_of_week[number] + "* \n" + \
-#            get_selected_day_schedule(number, type_of_week, view_type) + "\n\n"
 
 
 def type_of_week():

@@ -4,15 +4,16 @@ import schedule_manager
 import database
 from telebot import types
 
-from timer import *
 from time import sleep
+from timer import *
 
 bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
 timetable = schedule_manager
 
 buttons_text = ['📌 Сегодня', '📋 Завтра', '📍 Эта неделя', '📅 Следующая', '🔧 Настройки']
-settings_text = ['❓ Помощь', '👥  Сменить группу', '🧾 Изменить отображение расписания', '⚙   Дополнительно', '⬅  Назад']
-additional_text= ['📙 Четность недели', '📗 Обозначения', '⬅  Назад']
+settings_text = ['❓ Помощь', '👥  Сменить группу', '🧾 Изменить отображение расписания', '⚙   Дополнительно',
+                 '⬅  Назад']
+additional_text = ['📙 Четность недели', '📗 Обозначения', '⬅  Назад']
 view_type_text = ['1️⃣   Полное', '2️⃣   Короткое']
 
 start_text = "setting...up...Done!\n\n" \
@@ -26,15 +27,13 @@ help_text = ("Данный бот предназначен для использ
              "/week — Расписание на текущую неделю\n" +
              "/next — Расписание на следующую неделю\n\n" +
              "Если нашли ошибку или есть вопросы, обращайтесь на почту\n ➡   tvdragunvova@mail.ru")
-abbreviation = "БМ» — ул. Большая Морская, д.18\n"\
-                "«Д» — пер. Джамбула, д.13\n"\
-                "«В» — Вознесенский пр., д.46\n"\
-                "«М» — Моховая ул., д.26\n"\
-                "'ДО' – дистанционное обучение"\
+abbreviation = "БМ» — ул. Большая Морская, д.18\n" \
+               "«Д» — пер. Джамбула, д.13\n" \
+               "«В» — Вознесенский пр., д.46\n" \
+               "«М» — Моховая ул., д.26\n" \
+               "'ДО' – дистанционное обучение"\
 
 commands_count = 0
-
-group_list = ["1-ТИД-3"]
 
 
 # ======================================================================================================KEYBOARDS
@@ -49,7 +48,6 @@ def main_keyboard():
     button_3 = types.KeyboardButton(buttons_text[2])
     button_4 = types.KeyboardButton(buttons_text[3])
     button_5 = types.KeyboardButton(buttons_text[4])
-
 
     keyboard.add(button_1, button_2, button_3, button_4, button_5)
     keyboard.resize_keyboard = True
@@ -70,7 +68,6 @@ def settings_keyboard():
     keyboard.row(button_4)
     keyboard.row(button_5)
 
-
     keyboard.resize_keyboard = True
     return keyboard
 
@@ -80,10 +77,10 @@ def groups_keyboard():
 
     number = 0
 
-    for group in sorted(group_list):
+    for group in sorted(timetable.group_list):
         name = group
-        values = [number, name]
-        # database.insert_data("groups_list", values, database.db_file)
+        # values = [number, name]
+        # # database.insert_data("groups_list", values, database.db_file)
 
         button = types.KeyboardButton(name)
         keyboard.add(button)
@@ -99,7 +96,6 @@ def additional_keyboard():
     button_1 = types.KeyboardButton(additional_text[0])
     button_2 = types.KeyboardButton(additional_text[1])
     button_3 = types.KeyboardButton(additional_text[2])
-
 
     keyboard.row(button_1, button_2)
     keyboard.row(button_3)
@@ -125,7 +121,6 @@ def change_view_type():
 # Handler for command /start
 @bot.message_handler(commands=['start'])
 def on_start(message):
-    get_data()
     if not check_user_existence(message):
         bot.send_message(
             message.chat.id,
@@ -153,29 +148,25 @@ def on_help(message):
 # Handler for command /today
 @bot.message_handler(commands=['today'])
 def on_today(message):
-    print("f")
-    # timetable_handler(message, 'today')
+    timetable_handler(message, 'today')
 
 
 # Handler for command /tomorrow
 @bot.message_handler(commands=['tomorrow'])
 def on_tomorrow(message):
-    print("f")
-    # timetable_handler(message, 'tomorrow')
+    timetable_handler(message, 'tomorrow')
 
 
 # Handler for command /week
 @bot.message_handler(commands=['week'])
 def on_week(message):
-    print("f")
-    # timetable_handler(message, 'current')
+    timetable_handler(message, 'current')
 
 
 # Handler for command /next
 @bot.message_handler(commands=['next'])
 def on_next(message):
-    print("f")
-    # timetable_handler(message, 'next')
+    timetable_handler(message, 'next')
 
 
 # =================================================================================================KEYBOARD HANDLERS
@@ -276,7 +267,6 @@ def keyboard_handlers(message):
             )
             break
 
-
         # additional keyboard
         if case(additional_text[0]):
             bot.send_message(
@@ -306,15 +296,18 @@ def keyboard_handlers(message):
 # ================================================================================================================DATA
 
 # Getting started with sheet's data
-def get_data():
-    timetable.refresh_data()
+def get_data(group_name):
+    timetable.refresh_data(group_name)
 
 
 # Check if timetable is empty
-def check_timetable():
-    timetable.refresh_data()
-    # if len(timetable.denominator) == 0:
-    #     timetable.refresh_data()
+def check_timetable(message):
+    try:
+        user_group = database.get_user_data(message.chat.id, "group_name", database.db_file)
+        if len(timetable.values) == 0:
+            get_data(user_group)
+    except IndexError:
+        bot.reply_to(message, "Пожалуйста, сделайте рестарт с помощью команды /start")
 
 
 def registration(message):
@@ -343,7 +336,7 @@ def check_user_commands(message):
 def check_user_existence(message):
     result: bool = False
     try:
-        user_name = database.get_user_data(message.chat.id, "user_name", database.db_file)
+        user_name = database.get_user_data(message.chat.id, "chat_id", database.db_file)
         result = True
     except telebot.apihelper.ApiTelegramException:
         result = False
@@ -381,11 +374,6 @@ def change_user_info(message, info: str):
 # =========================================================================================================OTHER
 
 
-def print_week_schedule(message, type_of_week: bool):
-    for i in range(6):
-        bot.send_message(message.chat.id, timetable.send_week_day(i, type_of_week), parse_mode="Markdown")
-
-
 class Switch(object):
     value = None
 
@@ -400,39 +388,27 @@ def case(*args):
 
 # Handler for timetable
 def timetable_handler(message, command: str):
-    check_timetable()
+    check_timetable(message)
 
-    # user_group = database.get_user_data(message.chat.id, "group_name", database.db_file)
     view_type = database.get_user_data(message.chat.id, "view_type", database.db_file)
 
     while Switch(command):
         if case('today'):
-            bot.reply_to(message, timetable.get_day_schedule("Сегодня", view_type), parse_mode="Markdown")
-            # bot.reply_to(message, timetable.get_schedule_today_or_tomorrow(user_group, False, view_type),
-            #              parse_mode="Markdown")
+            bot.reply_to(message, timetable.get_day_schedule("Сегодня", view_type),
+                         parse_mode="Markdown")
             break
         if case('tomorrow'):
-            bot.reply_to(message, timetable.get_day_schedule("Завтра", view_type), parse_mode="Markdown")
-            # bot.reply_to(message, timetable.get_schedule_today_or_tomorrow(user_group, True, view_type),
-            #              parse_mode="Markdown")
+            bot.reply_to(message, timetable.get_day_schedule("Завтра", view_type),
+                         parse_mode="Markdown")
             break
         if case('current'):
-            bot.reply_to(message, timetable.get_week_schedule("Текущая", view_type), parse_mode="Markdown")
-            # current_type = timetable.set_week_schedule("Текущая")
-            # print_week_schedule(message, current_type)
-
-            # bot.reply_to(message, timetable.get_schedule_current_or_next(user_group, False, view_type),
-            #              parse_mode="Markdown")
+            bot.reply_to(message, timetable.get_week_schedule("Текущая", view_type),
+                         parse_mode="Markdown")
             break
         if case('next'):
-            bot.reply_to(message, timetable.get_week_schedule("Следующая", view_type), parse_mode="Markdown")
-            # current_type = timetable.set_week_schedule("Следующая")
-            # print_week_schedule(message, current_type)
-
-            # bot.reply_to(message, timetable.get_schedule_current_or_next(user_group, True, view_type),
-            #              parse_mode="Markdown")
+            bot.reply_to(message, timetable.get_week_schedule("Следующая", view_type),
+                         parse_mode="Markdown")
             break
-
 
 
 def show_main_menu(message):
@@ -445,16 +421,14 @@ def show_main_menu(message):
 
 def send_message_to_all_users():
     users = database.select_all_users()
-    # for user in users:
-    #     bot.send_message(
-    #         user[0],
-    #         "Починила и теперь могу кидать всем сообщения об обновлении. Воообще мне надо было юзать бд для того, \
-    #         чтобы сделить сколько сообщений отправил один человек, чтобы не было спама, но мне оч не хочется \
-    #         за это садиться, поэтому я делаю другую фигню. Кек, " + user[2]
-    #
-    #     )
+    for user in users:
+        bot.send_message(
+            user[0],
+            "Добрый вечер! Просто проверочка. Бот пока работает не совсем стабильно, обращаю внимание на это"
+        )
 
 
+# send_message_to_all_users()
 rt = RepeatedTimer(25, database.reset_commands_count)  # it auto-starts, no need of rt.start()
 
 # # send_message_to_all_users()
@@ -463,6 +437,7 @@ rt = RepeatedTimer(25, database.reset_commands_count)  # it auto-starts, no need
 #
 # # rt = RepeatedTimer(1, hello, "World") # it auto-starts, no need of rt.start()
 # threading.Thread(target=lambda: timer.every(10, database.reset_commands_count())).start()
+print("bot has been started successfully")
+bot.polling(none_stop=True)
 
-# bot.polling(none_stop=True)
-bot.infinity_polling(none_stop=True, interval=0, timeout=20)
+# bot.infinity_polling(none_stop=True)
