@@ -165,11 +165,16 @@ def get_day_schedule(type_of_day: str, view_type):
     current_day_of_week = selected_day.weekday()  # Номер выбранного дня в неделе
 
     if current_day_of_week != 6:  # Если не воскресенье то
-        result = "Расписание на " + type_of_day.lower() + ":\n" + get_selected_day_schedule(current_day_of_week,
-                                                                                            current_type, view_type)
+        current_schedule = get_selected_day_schedule(current_day_of_week, current_type, view_type)
+
+        if current_schedule == "":
+            result = "Выходной день 😘"
+        else:
+            result = "Расписание на " + type_of_day.lower() + ":\n" + current_schedule
+
         return result
     else:
-        return "уихадноу"
+        return "Выходной день 😘"
 
 
 # Возвращает расписание на неделю
