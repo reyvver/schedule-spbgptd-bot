@@ -63,17 +63,6 @@ def check_existence(table_name: str, database: str):
         return True
 
 
-# def prepare_condition(conditions):
-#     result = ""
-#
-#     if len(conditions) > 1:
-#         print("dfg")
-#     else:
-#         for condition in conditions:
-#             result += '(' + condition + ') AND'
-#
-
-
 def post_sql_query(sql_query, database: str):
     if database == db_file:
         connection = sqlite3.connect(database, check_same_thread=False)
@@ -91,13 +80,13 @@ def post_sql_query(sql_query, database: str):
         return result
 
 
-def register_user(chat_id, user_name, first_name, group_name):
+def register_user(chat_id, user_name, group_name, message_id):
     try:
         user_check_query = '''SELECT * FROM users WHERE chat_id = %d;''' % chat_id
         result = post_sql_query(user_check_query, db_file)
 
         if len(result) == 0:
-            values = [chat_id, user_name, first_name, group_name, "full"]
+            values = [chat_id, user_name, group_name, "full", message_id]
             insert_data("users", values, db_file)
             if user_name is None:
                 user_name = "Безымянный"
@@ -130,10 +119,8 @@ def quote_identifier(s, errors="strict"):
 
 def select_all_users():
     sql_query = '''SELECT * FROM users'''
-    return post_sql_query(sql_query, db_memory)
+    return post_sql_query(sql_query, db_file)
 
-
-# # # ДОДЕЛАТЬ НАДО
 
 def start_db():
     create_table("users", "chat_id INTEGER PRIMARY KEY NOT NULL, commands_count INTEGER", db_memory)
@@ -144,45 +131,13 @@ def reset_commands_count():
     update_data("users", values, db_memory)
 
 
-def get_user_data(chat_id: int, item: str, database: str):
-    sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
-    return post_sql_query(sql_query, database)[0][0]
+def get_user_data(id_user: int, database: str,  everything=False, item=None):
+    if not everything:
+        sql_query = '''SELECT %s FROM users WHERE chat_id = %d;''' % (item, id_user)
+        return post_sql_query(sql_query, database)[0][0]
+    else:
+        sql_query = '''SELECT * FROM users WHERE message_id = %d;''' % id_user
+        return post_sql_query(sql_query, database)[0]
 
 
 start_db()
-
-
-# def change_command_count(command_name):
-#     sql_query = '''SELECT count FROM commands WHERE command = "%s"''' % command_name
-#     number: int = post_sql_query(sql_query, db_file)[0][0] + 1
-#     values = {"count": number}
-#     update_data("commands", values, db_file, 'command="' + command_name + '"')
-
-
-# create_table("users", "chat_id INTEGER PRIMARY KEY NOT NULL, user_name TEXT, first_name TEXT", db_file)
-
-# my_dict = {'a': 1, 'b': 2, 'c': 3}
-# # print(my_dict.items())
-# # key0, value0 = list(my_dict.items())[0]
-# # print(key0)
-# # print(value0)
-# update_data("sdf", my_dict,"sdfg")
-
-# "chat_id INTEGER PRIMARY KEY NOT NULL, user_name TEXT, first_name TEXT"
-# max_id = db.execute(
-#     'SELECT max(%s) FROM %s where foo > ?' %(id_name, table_name),
-#     (max_foo_value, ),
-# )
-# create_table("users", "chat_id INTEGER PRIMARY KEY NOT NULL, user_name TEXT, first_name TEXT")
-# sql_query = "SELECT * FROM users WHERE chat_id=378950106"
-# print(post_sql_query(sql_query, db_file))
-#
-# sql_query = "SELECT * FROM userss WHERE commands_count=2222"
-# print(post_sql_query(sql_query, db_file))
-#
-# sql_query = '''UPDATE userss SET commands_count=666 WHERE chat_id="HERT"'''
-# print(post_sql_query(sql_query, db_file))
-# create_table("userss", "chat_id INTEGER PRIMARY KEY NOT NULL, commands_count INTEGER", db_file)
-# my_dict = {'commands_count': 0}
-# number = 1
-# update_data("userss", my_dict, db_file, "chat_id=" + str(number))
