@@ -76,7 +76,6 @@ def initialize_day_schedule(first_row_of_day: int):
 
     while counter < end:
         if (counter < len(values)) & (counter + 1 < len(values)):
-
             numerator = values[counter]
             denominator = values[counter + 1]
 
@@ -160,8 +159,9 @@ def get_day_schedule(type_of_day: str, view_type):
 
     current_day_of_week = selected_day.weekday()  # Номер выбранного дня в неделе
 
-    day_to_str = str(selected_day.day) + "/" + str(selected_day.month) + "/" + str(selected_day.year)
-    result = "Расписание на " + type_of_day.lower() + " (" + day_to_str + ")" + ":\n\n"
+    day_to_str = edit_date_number(selected_day.day) + "/" + edit_date_number(selected_day.month) + "/" + str(
+        selected_day.year)
+    result = "*Расписание на " + type_of_day.lower() + " (" + day_to_str + ")" + ":*\n"
 
     if current_day_of_week == 6:
         return result + "Выходной день 😘"
@@ -217,14 +217,14 @@ def full_view_type(item: ClassItem, group: str):
     else:
         class_full = space + class_name + " " + class_type + "\n"
 
-    result = "\n" + space + time_period + "\n" + class_full + space + location + "\n" + space + group + "\n\n"
+    result = "\n" + space + time_period + "\n" + class_full + space + location + "\n" + space + group + "\n"
 
     return result
 
 
 def short_view_type(item: ClassItem, group: str):
     result = "\n⏰ " + item.time_range + "  -  " + item.class_name + " (" + item.class_type + ")\n" \
-             "🏫 " + item.location + " (" + group + ")" + "\n"
+                                                                                             "🏫 " + item.location + " (" + group + ")" + "\n"
     return result
 
 
@@ -237,3 +237,8 @@ def edit_string(text: str):
         return first_part + "\n" + space + second_part
     else:
         return text
+
+
+def edit_date_number(number: int):
+    if number < 10:
+        return "0" + str(number)
