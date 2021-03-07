@@ -18,5 +18,6 @@ registration_text = "Готов к работе! Для отображения �
 
 buttons_text = ['📌 Сегодня', '📋 Завтра', '📍 Эта неделя', '📅 Следующая', '🔧 Настройки']
 query_timetable = ["main_today", "main_tomorrow", "main_current", "main_next", "main_settings"]
+query_settings = ["sasaas", "change_group", "change_view_type", "sasa", "go_back"]
 
 error_empty_timetable = "Что-то пошло не так"

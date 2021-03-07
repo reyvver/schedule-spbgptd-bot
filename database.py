@@ -49,7 +49,7 @@ def update_data(table_name: str, values: dict, database: str, condition=None):
         sql_query = ('''UPDATE %s SET %s''' % (table_name, result_values))
     else:
         sql_query = ('''UPDATE %s SET %s WHERE %s''' % (table_name, result_values, condition))
-
+    print(sql_query)
     post_sql_query(sql_query, database)
 
 
@@ -131,13 +131,8 @@ def reset_commands_count():
     update_data("users", values, db_memory)
 
 
-def get_user_data(id_user: int, database: str,  everything=False, item=None):
-    if not everything:
-        sql_query = '''SELECT %s FROM users WHERE chat_id = %d;''' % (item, id_user)
-        return post_sql_query(sql_query, database)[0][0]
-    else:
-        sql_query = '''SELECT * FROM users WHERE message_id = %d;''' % id_user
-        return post_sql_query(sql_query, database)[0]
+def get_user_data(chat_id: int, database: str, item):
+    sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
+    return post_sql_query(sql_query, database)[0]
 
 
-start_db()

@@ -40,26 +40,27 @@ def check_user_existence():
 
 
 def change_user_information(info: str, value):
+    global current_user
     condition = "chat_id=" + str(current_user.chat_id)
-    values = []
 
     while Switch(info):
         if case("message_id"):
-            values = {info: value}
             current_user.message_id = value
             break
-
-        if case("group"):
+        if case("group_name"):
+            current_user.group = value
             break
         if case("view_type"):
+            current_user.view_type = value
             break
 
+    values = {info: value}
     database.update_data("users", values, database.db_file, condition)
 
 
 def reload_user(chat_id):
     global current_user
-    user_db = database.get_user_data(chat_id, database.db_file, True)
+    user_db = database.get_user_data(chat_id, database.db_file, "*")
     current_user = User(user_db[0], user_db[2], user_db[3], user_db[4])
 
 
