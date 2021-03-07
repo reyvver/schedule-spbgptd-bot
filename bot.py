@@ -33,7 +33,7 @@ abbreviation = "БМ» — ул. Большая Морская, д.18\n" \
                "«М» — Моховая ул., д.26\n" \
                "'ДО' – дистанционное обучение" \
 
-commandss_count = 0
+commands_count = 0
 adm_console = False
 
 
