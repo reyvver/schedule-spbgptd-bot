@@ -70,13 +70,13 @@ def get_day_schedule(type_of_day: str, view_type):
     current_day_number = selected_day.weekday()
 
     if current_day_number == 6:
-        return result + "Выходной день 😘"
+        return result + "\nВыходной день 😘"
 
     current_week_type = define_type_of_current_week(selected_day)
     current_schedule = get_selected_day_schedule(current_day_number, current_week_type, view_type)
 
     if current_schedule == "":
-        return result + "Выходной день 😘"
+        return result + "\nВыходной день 😘"
 
     return result + current_schedule
 

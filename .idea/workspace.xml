@@ -20,18 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b92f9e1-be79-47d0-93a7-665fd3f41e5d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/schedule.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/schedule_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/switch.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/schedule.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schedule_manager.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/strings.py" beforeDir="false" afterPath="$PROJECT_DIR$/strings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/timer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schedule_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/schedule_controller.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
