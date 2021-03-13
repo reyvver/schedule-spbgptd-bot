@@ -46,8 +46,8 @@ def process_callback_settings(query):
 # View_type
 @bot.callback_query_handler(lambda query: query.data in strings.query_view_type)
 def process_callback_groups(query):
-    user.change_user_information("view_type", query.data)
-    echo(strings.set_up, main_markup())
+    user.set_user(query.message.chat.id, query.message.message_id)
+    view_type_handler(query.data)
     bot.answer_callback_query(query.id)
 
 
@@ -169,6 +169,18 @@ def settings_handler(string):
         if case(strings.query_settings[3]):
             echo(strings.set_up, main_markup())
             break
+
+
+def view_type_handler(string):
+    while Switch(string):
+        if case(strings.query_view_type[0]):
+            user.change_user_information("view_type", "full")
+            break
+        if case(strings.query_view_type[1]):
+            user.change_user_information("view_type", "short")
+            break
+
+    echo(strings.set_up, main_markup())
 
 
 def send_message_to_all_users(message_text: str):
