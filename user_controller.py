@@ -1,4 +1,5 @@
 import database
+from switch import *
 from user_models import *
 
 current_user: User
@@ -30,7 +31,7 @@ def initialise_user(query):
 
 
 # ===========================================================================================================БАЗА ДАННЫХ
-def check_user_existence():
+def is_created():
     try:
         current_user
     except NameError:
@@ -64,15 +65,24 @@ def reload_user(chat_id):
     current_user = User(user_db[0], user_db[2], user_db[3], user_db[4])
 
 
-# ================================================================================================================ДРУГОЕ
-
-class Switch(object):
-    value = None
-
-    def __new__(cls, value):
-        cls.value = value
-        return True
+def check_message_id(new_message_id):
+    if current_user.message_id != new_message_id:
+        change_user_information("message_id", new_message_id)
 
 
-def case(*args):
-    return any((arg == Switch.value for arg in args))
+def changing_group(new_group_name, new_message_id):
+    change_user_information("group_name", new_group_name)
+    change_user_information("message_id", new_message_id)
+
+
+def set_user(chat_id, message_id):
+    if is_created():
+        return
+    else:
+        reload_user(chat_id)
+        check_message_id(message_id)
+
+
+def select_all_user():
+    users = database.select_all_users()
+    return users

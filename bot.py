@@ -1,87 +1,63 @@
+import requests
 import telebot
 from telebot import types
 
 import config
-import schedule_manager
-import user_manager
-import database
+import schedule_controller
+import user_controller
 import strings
-
-from timer import *
+from switch import *
 
 bot = telebot.TeleBot(config.TELEGRAM_TOKEN)
-timetable = schedule_manager
-user = user_manager
 
-
-def groups_keyboard():
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-
-    for group in sorted(timetable.group_list):
-        name = group
-        button = types.InlineKeyboardButton(name, callback_data=name)
-        keyboard.add(button)
-
-    keyboard.resize_keyboard = True
-
-    return keyboard
+timetable = schedule_controller
+user = user_controller
 
 
 # Handler for command /start
 @bot.message_handler(commands=['start'])
 def on_start(message):
-    if not user.check_user_existence():  # если не существует, то выбирает сначала группу.
-        bot.send_message(
-            message.chat.id,
-            strings.on_start_string,
-            reply_markup=types.ReplyKeyboardRemove()
-        )
-        bot.send_message(
-            message.chat.id,
-            strings.start_text,
-            reply_markup=groups_keyboard()
-        )
+    if not user.is_created():
+        bot.send_message(message.chat.id, strings.set_up, reply_markup=types.ReplyKeyboardRemove())
+    on_set_group(message)
 
 
-# Getting started with sheet's data
-def get_data(group_name):
-    timetable.refresh_data(group_name)
+@bot.message_handler(commands=['set_group'])
+def on_set_group(message):
+    bot.send_message(message.chat.id, strings.start_text, reply_markup=groups_markup())
 
 
-# Check if timetable is empty
-def check_timetable(message):
-    try:
-        user_group = user.current_user.group
-        if len(timetable.values) == 0:
-            get_data(user_group)
-    except IndexError:
-        bot.reply_to(message, strings.error_empty_timetable)
+# Displaying a schedule
+@bot.callback_query_handler(lambda query: query.data in strings.query_timetable)
+def process_callback_timetable(query):
+    user.set_user(query.message.chat.id, query.message.message_id)
+    timetable_handler(query.data)
+    bot.answer_callback_query(query.id)
 
 
-def registration(query):
-    user.initialise_user(query)
-    echo(strings.registration_text, main_markup())
+# Settings
+@bot.callback_query_handler(lambda query: query.data in strings.query_settings)
+def process_callback_settings(query):
+    user.set_user(query.message.chat.id, query.message.message_id)
+    settings_handler(query.data)
+    bot.answer_callback_query(query.id)
 
 
-class Switch(object):
-    value = None
-
-    def __new__(cls, value):
-        cls.value = value
-        return True
-
-
-def case(*args):
-    return any((arg == Switch.value for arg in args))
+# View_type
+@bot.callback_query_handler(lambda query: query.data in strings.query_view_type)
+def process_callback_groups(query):
+    user.change_user_information("view_type", query.data)
+    echo(strings.set_up, main_markup())
+    bot.answer_callback_query(query.id)
 
 
-def send_message_to_all_users(message_text: str):
-    users = database.select_all_users()
-    for usr in users:
-        bot.send_message(
-            usr[0],
-            message_text
-        )
+# Groups
+@bot.callback_query_handler(lambda query: query.data in strings.group_list)
+def process_callback_groups(query):
+    if not user.is_created():
+        registration(query)
+    else:
+        changing_group(query)
 
 
 def echo(text: str, custom_reply_markup=None):
@@ -93,64 +69,73 @@ def echo(text: str, custom_reply_markup=None):
                               reply_markup=custom_reply_markup)
     except telebot.apihelper.ApiTelegramException:
         return
+    except requests.RequestException:
+        return
+
+
+def registration(query):
+    user.initialise_user(query)
+    echo(strings.registration_text, main_markup())
+
+
+def changing_group(query):
+    user.changing_group(query.data, query.message.message_id)
+    timetable.clear_timetable()
+    bot.answer_callback_query(query.id, "Готово! Группа изменена на " + query.data, show_alert=True)
+    echo(strings.registration_text, main_markup())
 
 
 def main_markup():
     markup = types.InlineKeyboardMarkup(row_width=2)
-    button_1 = types.InlineKeyboardButton(strings.buttons_text[0], callback_data=strings.query_timetable[0])
-    button_2 = types.InlineKeyboardButton(strings.buttons_text[1], callback_data=strings.query_timetable[1])
-    button_3 = types.InlineKeyboardButton(strings.buttons_text[2], callback_data=strings.query_timetable[2])
-    button_4 = types.InlineKeyboardButton(strings.buttons_text[3], callback_data=strings.query_timetable[3])
-    button_5 = types.InlineKeyboardButton(strings.buttons_text[4], callback_data=strings.query_timetable[4])
+    button_1 = types.InlineKeyboardButton(strings.text_timetable[0], callback_data=strings.query_timetable[0])
+    button_2 = types.InlineKeyboardButton(strings.text_timetable[1], callback_data=strings.query_timetable[1])
+    button_3 = types.InlineKeyboardButton(strings.text_timetable[2], callback_data=strings.query_timetable[2])
+    button_4 = types.InlineKeyboardButton(strings.text_timetable[3], callback_data=strings.query_timetable[3])
+    button_5 = types.InlineKeyboardButton(strings.text_timetable[4], callback_data=strings.query_timetable[4])
 
     markup.add(button_1, button_2, button_3, button_4, button_5)
-    # markup.add(button_3, button_4)
-    # markup.add(button_5)
+
     return markup
 
 
 def settings_markup():
     markup = types.InlineKeyboardMarkup(row_width=3)
-    button_1 = types.InlineKeyboardButton(strings.settings_text[0], callback_data=strings.query_settings[0])
-    button_2 = types.InlineKeyboardButton(strings.settings_text[1], callback_data=strings.query_settings[1])
-    button_3 = types.InlineKeyboardButton(strings.settings_text[2], callback_data=strings.query_settings[2])
-    button_4 = types.InlineKeyboardButton(strings.settings_text[3], callback_data=strings.query_settings[3])
-    button_5 = types.InlineKeyboardButton(strings.settings_text[4], callback_data=strings.query_settings[4])
+    button_1 = types.InlineKeyboardButton(strings.text_settings[0], callback_data=strings.query_settings[0])
+    button_2 = types.InlineKeyboardButton(strings.text_settings[1], callback_data=strings.query_settings[1])
+    button_3 = types.InlineKeyboardButton(strings.text_settings[2], callback_data=strings.query_settings[2])
+    button_4 = types.InlineKeyboardButton(strings.text_settings[3], callback_data=strings.query_settings[3])
 
     markup.add(button_1, button_2)
-    markup.add(button_3, button_4)
-    markup.add(button_5)
+    markup.add(button_3)
+    markup.add(button_4)
+
     return markup
 
 
-# Setting up user group
-@bot.callback_query_handler(lambda query: query.data in timetable.group_list)
-def process_callback_groups(query):
-    if not user.check_user_existence():
-        registration(query)
-    else:
-        user_manager.change_user_information("group_name", query.data)
-        echo("Готово! Группа изменена на " + query.data, main_markup())
-        timetable.values.clear()
+def view_type_markup():
+    markup = types.InlineKeyboardMarkup()
+    button_1 = types.InlineKeyboardButton(strings.text_view_type[0], callback_data=strings.query_view_type[0])
+    button_2 = types.InlineKeyboardButton(strings.text_view_type[1], callback_data=strings.query_view_type[1])
+    markup.add(button_1, button_2)
+
+    return markup
 
 
-# Displaying a schedule
-@bot.callback_query_handler(lambda query: query.data in strings.query_timetable)
-def process_callback_timetable(query):
-    if not user.check_user_existence():
-        user_manager.reload_user(query.message.chat.id)
+def groups_markup():
+    markup = types.InlineKeyboardMarkup(row_width=2)
 
-    if user_manager.current_user.message_id != query.message.message_id:
-        user_manager.change_user_information("message_id", query.message.message_id)
+    for group in sorted(strings.group_list):
+        name = group
+        button = types.InlineKeyboardButton(name, callback_data=name)
+        markup.add(button)
 
-    check_timetable(query.message)
-    timetable_handler(query.data)
-
-    bot.answer_callback_query(query.id)
+    return markup
 
 
 def timetable_handler(string):
     view_type = user.current_user.view_type
+    group = user.current_user.group
+    timetable.check_timetable(group)
 
     while Switch(string):
         if case(strings.query_timetable[0]):
@@ -170,27 +155,28 @@ def timetable_handler(string):
             break
 
 
-@bot.callback_query_handler(lambda query: query.data in strings.query_settings)
-def process_callback_settings(query):
-    if not user.check_user_existence():
-        user_manager.reload_user(query.message.chat.id)
-    settings_handler(query.data)
-
-
 def settings_handler(string):
     while Switch(string):
         if case(strings.query_settings[0]):
+            echo(strings.help_text, main_markup())
             break
         if case(strings.query_settings[1]):
-            echo(strings.start_text, groups_keyboard())
+            echo(strings.start_text, groups_markup())
             break
         if case(strings.query_settings[2]):
+            echo(strings.view_type_text, view_type_markup())
             break
         if case(strings.query_settings[3]):
+            echo(strings.set_up, main_markup())
             break
-        if case(strings.query_settings[4]):
-            echo(strings.on_start_string, main_markup())
-            break
+
+
+def send_message_to_all_users(message_text: str):
+    for usr in user.select_all_user():
+        bot.send_message(
+            usr[0],
+            message_text
+        )
 
 
 print("bot has been started successfully")
