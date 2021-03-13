@@ -20,13 +20,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b92f9e1-be79-47d0-93a7-665fd3f41e5d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/schedule.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/schedule_controller.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/switch.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/schedule.db" beforeDir="false" afterPath="$PROJECT_DIR$/schedule.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schedule_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/schedule_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schedule_manager.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/strings.py" beforeDir="false" afterPath="$PROJECT_DIR$/strings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/timer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_controller.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +94,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="schedule_manager" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="schedule" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="schedule-spbgptd-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -101,7 +106,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/schedule_manager.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\reyvver\Documents\GitHub\schedule-spbgptd-bot\schedule.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -113,7 +118,6 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.bot" />
-        <item itemvalue="Python.schedule_manager" />
       </list>
     </recent_temporary>
   </component>

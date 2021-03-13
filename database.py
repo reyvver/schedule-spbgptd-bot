@@ -49,7 +49,7 @@ def update_data(table_name: str, values: dict, database: str, condition=None):
         sql_query = ('''UPDATE %s SET %s''' % (table_name, result_values))
     else:
         sql_query = ('''UPDATE %s SET %s WHERE %s''' % (table_name, result_values, condition))
-    print(sql_query)
+
     post_sql_query(sql_query, database)
 
 
