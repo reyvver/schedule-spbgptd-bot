@@ -1,4 +1,3 @@
-import requests
 import telebot
 from telebot import types
 
@@ -17,8 +16,7 @@ user = user_controller
 # Handler for command /start
 @bot.message_handler(commands=['start'])
 def on_start(message):
-    if not user.is_created():
-        bot.send_message(message.chat.id, strings.set_up, reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(message.chat.id, strings.set_up, reply_markup=types.ReplyKeyboardRemove())
     on_set_group(message)
 
 
@@ -30,59 +28,62 @@ def on_set_group(message):
 # Displaying a schedule
 @bot.callback_query_handler(lambda query: query.data in strings.query_timetable)
 def process_callback_timetable(query):
-    user.set_user(query.message.chat.id, query.message.message_id)
-    timetable_handler(query.data)
+    chat_id = query.message.chat.id
+    timetable_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
 
 
 # Settings
 @bot.callback_query_handler(lambda query: query.data in strings.query_settings)
 def process_callback_settings(query):
-    user.set_user(query.message.chat.id, query.message.message_id)
-    settings_handler(query.data)
+    chat_id = query.message.chat.id
+    settings_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
 
 
 # View_type
 @bot.callback_query_handler(lambda query: query.data in strings.query_view_type)
 def process_callback_groups(query):
-    user.set_user(query.message.chat.id, query.message.message_id)
-    view_type_handler(query.data)
+    chat_id = query.message.chat.id
+    view_type_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
 
 
 # Groups
 @bot.callback_query_handler(lambda query: query.data in strings.group_list)
 def process_callback_groups(query):
-    if not user.is_created():
-        registration(query)
+    chat_id = query.message.chat.id
+
+    if not user.is_created(chat_id):
+        registration(chat_id, query)
     else:
-        changing_group(query)
+        changing_group(chat_id, query)
 
 
-def echo(text: str, custom_reply_markup=None):
+def echo(chat_id, text: str, custom_reply_markup=None):
     try:
+        message_id = user.user_data(chat_id, "message_id")
         bot.edit_message_text(text,
-                              chat_id=user.current_user.chat_id,
-                              message_id=user.current_user.message_id,
+                              chat_id=chat_id,
+                              message_id=message_id,
                               parse_mode="Markdown",
                               reply_markup=custom_reply_markup)
     except telebot.apihelper.ApiTelegramException:
         return
-    except requests.RequestException:
-        return
+    # except requests.RequestException:
+    #     return
 
 
-def registration(query):
+def registration(chat_id, query):
     user.initialise_user(query)
-    echo(strings.registration_text, main_markup())
+    echo(chat_id, strings.registration_text, main_markup())
 
 
-def changing_group(query):
-    user.changing_group(query.data, query.message.message_id)
+def changing_group(chat_id, query):
+    user.changing_group(query.message.chat.id, query.data, query.message.message_id)
     timetable.clear_timetable()
     bot.answer_callback_query(query.id, "Готово! Группа изменена на " + query.data, show_alert=True)
-    echo(strings.registration_text, main_markup())
+    echo(chat_id, strings.return_to_main_menu, main_markup())
 
 
 def main_markup():
@@ -132,55 +133,52 @@ def groups_markup():
     return markup
 
 
-def timetable_handler(string):
-    view_type = user.current_user.view_type
-    group = user.current_user.group
-    timetable.check_timetable(group)
-
+def timetable_handler(chat_id, string):
+    timetable.check_timetable(chat_id)
+    view_type = user.user_data(chat_id, "view_type")
     while Switch(string):
         if case(strings.query_timetable[0]):
-            echo(timetable.get_day_schedule("Сегодня", view_type), main_markup())
+            echo(chat_id, timetable.get_day_schedule("Сегодня", view_type), main_markup())
             break
         if case(strings.query_timetable[1]):
-            echo(timetable.get_day_schedule("Завтра", view_type), main_markup())
+            echo(chat_id, timetable.get_day_schedule("Завтра", view_type), main_markup())
             break
         if case(strings.query_timetable[2]):
-            echo(timetable.get_week_schedule("Текущая", view_type), main_markup())
+            echo(chat_id, timetable.get_week_schedule("Текущая", view_type), main_markup())
             break
         if case(strings.query_timetable[3]):
-            echo(timetable.get_week_schedule("Следующая", view_type), main_markup())
+            echo(chat_id, timetable.get_week_schedule("Следующая", view_type), main_markup())
             break
         if case(strings.query_timetable[4]):
-            echo("Переходим к настройкам..", settings_markup())
+            echo(chat_id, "Переходим к настройкам..", settings_markup())
             break
 
 
-def settings_handler(string):
+def settings_handler(chat_id, string):
     while Switch(string):
         if case(strings.query_settings[0]):
-            echo(strings.help_text, main_markup())
+            echo(chat_id, strings.help_text, main_markup())
             break
         if case(strings.query_settings[1]):
-            echo(strings.start_text, groups_markup())
+            echo(chat_id, strings.start_text, groups_markup())
             break
         if case(strings.query_settings[2]):
-            echo(strings.view_type_text, view_type_markup())
+            echo(chat_id, strings.view_type_text, view_type_markup())
             break
         if case(strings.query_settings[3]):
-            echo(strings.set_up, main_markup())
+            echo(chat_id, strings.return_to_main_menu, main_markup())
             break
 
 
-def view_type_handler(string):
-    while Switch(string):
-        if case(strings.query_view_type[0]):
-            user.change_user_information("view_type", "full")
-            break
-        if case(strings.query_view_type[1]):
-            user.change_user_information("view_type", "short")
-            break
+def view_type_handler(chat_id, string):
+    view_type: str
+    if string == strings.query_view_type[0]:
+        view_type = "full"
+    else:
+        view_type = "short"
+    user.changing_view_type(chat_id, view_type)
 
-    echo(strings.set_up, main_markup())
+    echo(chat_id, strings.return_to_main_menu, main_markup())
 
 
 def send_message_to_all_users(message_text: str):

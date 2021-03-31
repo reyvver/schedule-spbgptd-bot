@@ -1,3 +1,4 @@
+import user_controller
 from schedule_models import *
 import schedule
 import datetime
@@ -119,12 +120,13 @@ def full_view_type(item: ClassItem, group: str):
 
 
 def short_view_type(item: ClassItem, group: str):
-    result = "\n\n⏰ " + item.time_range + "  -  " + item.class_name + " (" + item.class_type + ")\n" \
-             "🏫 " + item.location + " (" + group + ")" + "\n"
+    result = "\n⏰ *" + item.time_range + "*  -  " + item.class_name + " (" + item.class_type + ")\n " \
+             + strings.space + item.location + " (" + group + ")" + ""
     return result
 
 
-def check_timetable(user_group):
+def check_timetable(chat_id):
+    user_group = user_controller.user_data(chat_id, "group_name")
     if len(schedule.values) == 0:
         schedule.refresh_data(user_group)
         initialize_schedule()
