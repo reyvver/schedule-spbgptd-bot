@@ -131,7 +131,7 @@ def reset_commands_count():
     update_data("users", values, db_memory)
 
 
-def get_user_data(chat_id: int, database: str, item):
+def get_user_data(chat_id: int, database: str, item: str):
     sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
     return post_sql_query(sql_query, database)[0]
 
