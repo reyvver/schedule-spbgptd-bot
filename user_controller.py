@@ -20,15 +20,21 @@ def initialise_user(query):
 
 
 def user_data(chat_id, data: str):
-    return database.get_user_data(chat_id, database.db_file, data)[0]
+    try:
+        result = database.get_user_data(chat_id, database.db_file, data)[0]
+    except TypeError:
+        return "None"
+    else:
+        return result
 
 
 def is_created(chat_id):
-    try:
-        result = user_data(chat_id, "message_id")
-        return True
-    except telebot.apihelper.ApiTelegramException:
+    result = user_data(chat_id, "message_id")
+
+    if result == "None":
         return False
+    else:
+        return True
 
 
 def change_user_information(chat_id, info: str, value):
@@ -49,4 +55,3 @@ def changing_group(chat_id, new_group_name, new_message_id):
 
 def changing_view_type(chat_id, value):
     change_user_information(chat_id, "view_type", value)
-

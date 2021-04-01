@@ -132,7 +132,11 @@ def reset_commands_count():
 
 
 def get_user_data(chat_id: int, database: str, item: str):
-    sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
-    return post_sql_query(sql_query, database)[0]
+    try:
+        sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
+        return post_sql_query(sql_query, database)[0]
+    except IndexError:
+        return None
+
 
 

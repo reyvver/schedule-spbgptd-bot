@@ -81,7 +81,6 @@ def registration(chat_id, query):
 
 def changing_group(chat_id, query):
     user.changing_group(query.message.chat.id, query.data, query.message.message_id)
-    timetable.clear_timetable()
     bot.answer_callback_query(query.id, "Готово! Группа изменена на " + query.data, show_alert=True)
     echo(chat_id, strings.return_to_main_menu, main_markup())
 
@@ -134,20 +133,25 @@ def groups_markup():
 
 
 def timetable_handler(chat_id, string):
-    timetable.check_timetable(chat_id)
     view_type = user.user_data(chat_id, "view_type")
+    group_name = user.user_data(chat_id, "group_name")
+
+    if view_type == "None":
+        bot.send_message(chat_id, "Пожалуйста, выполните команду /start")
+        return 0
+
     while Switch(string):
         if case(strings.query_timetable[0]):
-            echo(chat_id, timetable.get_day_schedule("Сегодня", view_type), main_markup())
+            echo(chat_id, timetable.get_day_schedule("Сегодня", view_type, group_name), main_markup())
             break
         if case(strings.query_timetable[1]):
-            echo(chat_id, timetable.get_day_schedule("Завтра", view_type), main_markup())
+            echo(chat_id, timetable.get_day_schedule("Завтра", view_type, group_name), main_markup())
             break
         if case(strings.query_timetable[2]):
-            echo(chat_id, timetable.get_week_schedule("Текущая", view_type), main_markup())
+            echo(chat_id, timetable.get_week_schedule("Текущая", view_type, group_name), main_markup())
             break
         if case(strings.query_timetable[3]):
-            echo(chat_id, timetable.get_week_schedule("Следующая", view_type), main_markup())
+            echo(chat_id, timetable.get_week_schedule("Следующая", view_type, group_name), main_markup())
             break
         if case(strings.query_timetable[4]):
             echo(chat_id, "Переходим к настройкам..", settings_markup())
