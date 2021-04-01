@@ -1,15 +1,7 @@
-import user_controller
 from schedule_models import *
 import schedule
 import datetime
 import strings
-
-timetable: WeekSchedule
-
-
-def initialize_schedule():
-    global timetable
-    timetable = schedule.initialize_week_schedule()
 
 
 # Четная или нечетная неделя, определяется относительно любого дня этой недели. week_type =
@@ -42,7 +34,9 @@ def get_item(item: ClassItem, view_type):
 
 
 # Возвращает расписание на выбранный день (включает проверку на четность / нечетность)
-def get_selected_day_schedule(number: int, type_week: bool, view_type):
+def get_selected_day_schedule(number: int, type_week: bool, view_type, group_name):
+    timetable: WeekSchedule = schedule.initialize_week_schedule(group_name)
+
     current_schedule: DaySchedule = timetable.days_schedule[number]
     result: str = ""
 
@@ -57,7 +51,7 @@ def get_selected_day_schedule(number: int, type_week: bool, view_type):
     return result
 
 
-def get_day_schedule(type_of_day: str, view_type):
+def get_day_schedule(type_of_day: str, view_type, group_name):
     if type_of_day == "Сегодня":
         selected_day = datetime.datetime.today()
     else:
@@ -74,7 +68,7 @@ def get_day_schedule(type_of_day: str, view_type):
         return result + "\nВыходной день 😘"
 
     current_week_type = define_type_of_current_week(selected_day)
-    current_schedule = get_selected_day_schedule(current_day_number, current_week_type, view_type)
+    current_schedule = get_selected_day_schedule(current_day_number, current_week_type, view_type, group_name)
 
     if current_schedule == "":
         return result + "\nВыходной день 😘"
@@ -83,7 +77,7 @@ def get_day_schedule(type_of_day: str, view_type):
 
 
 # Возвращает расписание на неделю
-def get_week_schedule(type_week: str, view_type):
+def get_week_schedule(type_week: str, view_type, group_name):
     current_type = define_type_of_current_week(datetime.datetime.today())
     result: str = ""
 
@@ -91,7 +85,7 @@ def get_week_schedule(type_week: str, view_type):
         current_type = not current_type
 
     for i in range(6):
-        day_timetable = get_selected_day_schedule(i, current_type, view_type)
+        day_timetable = get_selected_day_schedule(i, current_type, view_type, group_name)
         if day_timetable != "":
             result = result + strings.emoji[i] + " *" + strings.days_of_week[i] + "* \n" + day_timetable + "\n\n"
 
@@ -123,17 +117,6 @@ def short_view_type(item: ClassItem, group: str):
     result = "\n⏰ *" + item.time_range + "*  -  " + item.class_name + " (" + item.class_type + ")\n " \
              + strings.space + item.location + " (" + group + ")" + ""
     return result
-
-
-def check_timetable(chat_id):
-    user_group = user_controller.user_data(chat_id, "group_name")
-    if len(schedule.values) == 0:
-        schedule.refresh_data(user_group)
-        initialize_schedule()
-
-
-def clear_timetable():
-    schedule.values.clear()
 
 
 def type_of_week():
