@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+import tg_analytic
 
 import config
 import schedule_controller
@@ -25,12 +26,19 @@ def on_set_group(message):
     bot.send_message(message.chat.id, strings.start_text, reply_markup=groups_markup())
 
 
+@bot.message_handler(content_types=['text'])
+def on_text(message):
+    if message.text == strings.statistics_keyword:
+        get_statistics(message.text, message.chat.id)
+
+
 # Displaying a schedule
 @bot.callback_query_handler(lambda query: query.data in strings.query_timetable)
 def process_callback_timetable(query):
     chat_id = query.message.chat.id
     timetable_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
+    tg_analytic.statistics(chat_id, query.data)
 
 
 # Settings
@@ -39,6 +47,7 @@ def process_callback_settings(query):
     chat_id = query.message.chat.id
     settings_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
+    tg_analytic.statistics(chat_id, query.data)
 
 
 # View_type
@@ -47,6 +56,7 @@ def process_callback_groups(query):
     chat_id = query.message.chat.id
     view_type_handler(chat_id, query.data)
     bot.answer_callback_query(query.id)
+    tg_analytic.statistics(chat_id, query.data)
 
 
 # Groups
@@ -70,8 +80,8 @@ def echo(chat_id, text: str, custom_reply_markup=None):
                               reply_markup=custom_reply_markup)
     except telebot.apihelper.ApiTelegramException:
         return
-    # except requests.RequestException:
-    #     return
+    except KeyError:
+        bot.send_message(chat_id, "Пожалуйста, выполните команду /start")
 
 
 def registration(chat_id, query):
@@ -191,6 +201,19 @@ def send_message_to_all_users(message_text: str):
             usr[0],
             message_text
         )
+
+
+def get_statistics(txt, chat_id):
+    st = txt.text.split(' ')
+
+    if 'txt' in st or 'тхт' in st:
+        tg_analytic.analysis(st, chat_id)
+        with open('%s.txt' % chat_id, 'r', encoding='UTF-8') as file:
+            bot.send_document(chat_id, file)
+            tg_analytic.remove(chat_id)
+    else:
+        messages = tg_analytic.analysis(st, chat_id)
+        bot.send_message(chat_id, messages)
 
 
 print("bot has been started successfully")
