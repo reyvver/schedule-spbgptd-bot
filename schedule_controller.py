@@ -94,28 +94,30 @@ def get_week_schedule(type_week: str, view_type, group_name):
 
 def full_view_type(item: ClassItem, group: str):
     class_full: str
+    time_period = item.time_range
+    class_name = item.class_name
+    location = item.location
 
-    time_period = "⏰ _" + item.time_range + "_"
-    class_name = strings.edit_string("🖍 " + item.class_name)
-    class_type = "(" + item.class_type + ")"
-    location = "🏫 " + item.location
+    if item.class_type != "":
+        class_name += " (" + item.class_type + ")"
 
-    count = len(class_name + class_type)
-
-    if count >= 33:
-        class_full = strings.space + class_name + "\n" + strings.space + class_type + "\n"
-    else:
-        class_full = strings.space + class_name + " " + class_type + "\n"
-
-    result = "\n" + strings.space + time_period + "\n" + class_full + strings.space + location + "\n" + strings.space \
-             + group + "\n"
+    data: dict = {"time": time_period, "name": class_name, "location": location, "group": group}
+    result = strings.get_full_timetable(data)
 
     return result
 
 
 def short_view_type(item: ClassItem, group: str):
-    result = "\n⏰ *" + item.time_range + "*  -  " + item.class_name + " (" + item.class_type + ")\n " \
-             + strings.space + item.location + " (" + group + ")" + ""
+    time_period = item.time_range
+    class_name = item.class_name
+    location = item.location
+
+    if item.class_type != "":
+        class_name += " (" + item.class_type + ")"
+
+    data: dict = {"time": time_period, "name": class_name, "location": location, "group": group}
+    result = strings.get_short_timetable(data)
+
     return result
 
 
