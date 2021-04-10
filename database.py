@@ -63,17 +63,6 @@ def check_existence(table_name: str, database: str):
         return True
 
 
-# def prepare_condition(conditions):
-#     result = ""
-#
-#     if len(conditions) > 1:
-#         print("dfg")
-#     else:
-#         for condition in conditions:
-#             result += '(' + condition + ') AND'
-#
-
-
 def post_sql_query(sql_query, database: str):
     if database == db_file:
         connection = sqlite3.connect(database, check_same_thread=False)
@@ -91,13 +80,13 @@ def post_sql_query(sql_query, database: str):
         return result
 
 
-def register_user(chat_id, user_name, first_name, group_name):
+def register_user(chat_id, user_name, group_name, message_id):
     try:
         user_check_query = '''SELECT * FROM users WHERE chat_id = %d;''' % chat_id
         result = post_sql_query(user_check_query, db_file)
 
         if len(result) == 0:
-            values = [chat_id, user_name, first_name, group_name, "full"]
+            values = [chat_id, user_name, group_name, "full", message_id]
             insert_data("users", values, db_file)
             if user_name is None:
                 user_name = "Безымянный"
@@ -133,8 +122,6 @@ def select_all_users():
     return post_sql_query(sql_query, db_file)
 
 
-# # # ДОДЕЛАТЬ НАДО
-
 def start_db():
     create_table("users", "chat_id INTEGER PRIMARY KEY NOT NULL, commands_count INTEGER", db_memory)
 
@@ -144,9 +131,12 @@ def reset_commands_count():
     update_data("users", values, db_memory)
 
 
-def get_user_data(chat_id: int, item: str, database: str):
-    sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
-    return post_sql_query(sql_query, database)[0][0]
+def get_user_data(chat_id: int, database: str, item: str):
+    try:
+        sql_query = '''SELECT %s FROM users WHERE chat_id = %d''' % (item, chat_id)
+        return post_sql_query(sql_query, database)[0]
+    except IndexError:
+        return None
 
 
-start_db()
+
