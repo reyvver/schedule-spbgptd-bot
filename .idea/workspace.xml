@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b92f9e1-be79-47d0-93a7-665fd3f41e5d" name="Default Changelist" comment="">
+<<<<<<< Updated upstream
       <change afterPath="$PROJECT_DIR$/event_handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
@@ -29,6 +30,10 @@
       <change beforePath="$PROJECT_DIR$/schedule_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/schedule_controller.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strings.py" beforeDir="false" afterPath="$PROJECT_DIR$/strings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_controller.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
